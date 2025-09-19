@@ -1,0 +1,167 @@
+SOLARIS-X Feature Engineering - Complete Feature List
+============================================================
+
+Total Features: 93
+Dataset Records: 257,232
+Date Range: 1996-05-01 00:00:00 to 2025-09-03 23:00:00
+
+Feature Categories:
+------------------------------
+
+Original Parameters (27 features):
+  - AE_index
+  - Day_Cos
+  - Day_Sin
+  - Density_Speed_Product
+  - Dst_Rate
+  - Dst_index
+  - Flow_Deflection
+  - Flow_Pressure
+  - Flow_Speed
+  - Hour_Cos
+  - Hour_Sin
+  - IMF_Bt_YZ
+  - IMF_Bx
+  - IMF_By
+  - IMF_Bz
+  - IMF_Bz_North
+  - IMF_Bz_South
+  - IMF_Cone_Angle
+  - IMF_Magnitude
+  - IMF_Stability
+  - Kp_index
+  - Merging_Electric_Field
+  - Pressure_Gradient
+  - Proton_Density
+  - Proton_Temp
+  - Solar_Cycle_Phase
+  - Viscous_Function
+
+Magnetic Features (28 features):
+  - IMF_Bt_YZ
+  - IMF_Bx
+  - IMF_By
+  - IMF_Bz
+  - IMF_Bz_North
+  - IMF_Bz_South
+  - IMF_Bz_lag_12h
+  - IMF_Bz_lag_1h
+  - IMF_Bz_lag_24h
+  - IMF_Bz_lag_3h
+  - IMF_Bz_lag_6h
+  - IMF_Bz_mean_12h
+  - IMF_Bz_mean_24h
+  - IMF_Bz_mean_3h
+  - IMF_Bz_mean_6h
+  - IMF_Bz_std_12h
+  - IMF_Bz_std_24h
+  - IMF_Bz_std_3h
+  - IMF_Bz_std_6h
+  - IMF_Clock_Angle
+  - IMF_Cone_Angle
+  - IMF_Magnitude
+  - IMF_Magnitude_lag_12h
+  - IMF_Magnitude_lag_1h
+  - IMF_Magnitude_lag_24h
+  - IMF_Magnitude_lag_3h
+  - IMF_Magnitude_lag_6h
+  - IMF_Stability
+
+Coupling Functions (17 features):
+  - Epsilon_Parameter
+  - Merging_Electric_Field
+  - Newell_Coupling
+  - Newell_Coupling_lag_12h
+  - Newell_Coupling_lag_1h
+  - Newell_Coupling_lag_24h
+  - Newell_Coupling_lag_3h
+  - Newell_Coupling_lag_6h
+  - Newell_Coupling_mean_12h
+  - Newell_Coupling_mean_24h
+  - Newell_Coupling_mean_3h
+  - Newell_Coupling_mean_6h
+  - Newell_Coupling_std_12h
+  - Newell_Coupling_std_24h
+  - Newell_Coupling_std_3h
+  - Newell_Coupling_std_6h
+  - Viscous_Function
+
+Solar Wind Dynamics (4 features):
+  - Alfven_Mach
+  - Flow_Deflection
+  - Plasma_Beta
+  - Pressure_Gradient
+
+Temporal Features (5 features):
+  - Day_Cos
+  - Day_Sin
+  - Hour_Cos
+  - Hour_Sin
+  - Solar_Cycle_Phase
+
+Lag Features (25 features):
+  - Flow_Pressure_lag_12h
+  - Flow_Pressure_lag_1h
+  - Flow_Pressure_lag_24h
+  - Flow_Pressure_lag_3h
+  - Flow_Pressure_lag_6h
+  - Flow_Speed_lag_12h
+  - Flow_Speed_lag_1h
+  - Flow_Speed_lag_24h
+  - Flow_Speed_lag_3h
+  - Flow_Speed_lag_6h
+  - IMF_Bz_lag_12h
+  - IMF_Bz_lag_1h
+  - IMF_Bz_lag_24h
+  - IMF_Bz_lag_3h
+  - IMF_Bz_lag_6h
+  - IMF_Magnitude_lag_12h
+  - IMF_Magnitude_lag_1h
+  - IMF_Magnitude_lag_24h
+  - IMF_Magnitude_lag_3h
+  - IMF_Magnitude_lag_6h
+  - Newell_Coupling_lag_12h
+  - Newell_Coupling_lag_1h
+  - Newell_Coupling_lag_24h
+  - Newell_Coupling_lag_3h
+  - Newell_Coupling_lag_6h
+
+Rolling Statistics (32 features):
+  - Dst_index_mean_12h
+  - Dst_index_mean_24h
+  - Dst_index_mean_3h
+  - Dst_index_mean_6h
+  - Dst_index_std_12h
+  - Dst_index_std_24h
+  - Dst_index_std_3h
+  - Dst_index_std_6h
+  - Flow_Speed_mean_12h
+  - Flow_Speed_mean_24h
+  - Flow_Speed_mean_3h
+  - Flow_Speed_mean_6h
+  - Flow_Speed_std_12h
+  - Flow_Speed_std_24h
+  - Flow_Speed_std_3h
+  - Flow_Speed_std_6h
+  - IMF_Bz_mean_12h
+  - IMF_Bz_mean_24h
+  - IMF_Bz_mean_3h
+  - IMF_Bz_mean_6h
+  - IMF_Bz_std_12h
+  - IMF_Bz_std_24h
+  - IMF_Bz_std_3h
+  - IMF_Bz_std_6h
+  - Newell_Coupling_mean_12h
+  - Newell_Coupling_mean_24h
+  - Newell_Coupling_mean_3h
+  - Newell_Coupling_mean_6h
+  - Newell_Coupling_std_12h
+  - Newell_Coupling_std_24h
+  - Newell_Coupling_std_3h
+  - Newell_Coupling_std_6h
+
+Storm Targets (4 features):
+  - Storm_6h_Ahead
+  - Storm_Binary
+  - Storm_Intensity
+  - Storm_Onset
