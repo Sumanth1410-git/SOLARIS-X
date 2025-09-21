@@ -135,23 +135,45 @@ print("Geomagnetic Storm Prediction: Ready for deployment")
 
 ## 📁 **PROJECT STRUCTURE**
 
-SOLARIS-X/
-├── 📊 data/
-│ └── processed/features/ # Engineered datasets (excluded)
-├── 🤖 scripts/
-│ ├── preprocessing/ # Data processing pipeline
-│ └── training/ # ML model training
-│ ├── models/ # Individual model trainers
-│ ├── utils/ # Training utilities
-│ └── complete_pipeline.py # Main training orchestrator
-├── 💾 models/
-│ ├── trained/ # Production models (excluded)
-│ └── checkpoints/ # Training checkpoints (excluded)
-├── 📈 results/
-│ └── plots/ # Performance visualizations
-├── 📋 requirements.txt # Python dependencies
-├── 🔧 .gitignore # Git exclusion rules
-└── 📖 README.md # This file
+### **Core Directories**
+
+**📊 Data Pipeline**
+- `data/processed/features/` - Engineered feature datasets (excluded)
+- `data/raw/omni/` - Original OMNI database files (excluded)
+
+**🤖 Training System**  
+- `scripts/training/models/` - Individual model trainers (4 advanced models)
+- `scripts/training/utils/` - Training utilities and base classes
+- `scripts/training/complete_pipeline.py` - Main orchestrator
+
+**💾 Model Management**
+- `models/checkpoints/` - Training checkpoints and metadata
+- `models/trained/` - Production models (excluded)
+
+**📈 Results & Analysis**
+- `results/plots/` - Performance visualizations (10 charts)
+
+**📋 Configuration**
+- `requirements.txt` - Python dependencies
+- `.gitignore` - Repository optimization
+- `README.md` - Documentation
+
+### **Key Features**
+- **25+ Python modules** with professional architecture
+- **4 advanced ML models** including meta-ensemble system
+- **Complete MLOps pipeline** with automated evaluation
+- **Production-ready deployment** configuration
+
+---
+### **🏗️ Architecture Highlights**
+- **Modular Design**: Separated model trainers and utilities
+- **Production Ready**: Complete MLOps pipeline structure  
+- **Optimized Storage**: Large files excluded via .gitignore
+- **Comprehensive Evaluation**: Visualization and metrics tracking
+- **Professional Organization**: Clear separation of concerns
+
+**Note**: Files marked as "(excluded)" are not tracked in git due to size constraints but are generated during training.
+
 
 
 ---
@@ -253,4 +275,5 @@ This project is licensed under the **MIT License**.
 **[⭐ Star this repository](https://github.com/Sumanth1410-git/SOLARIS-X)** if it helps your research!
 
 </div>
+
 
