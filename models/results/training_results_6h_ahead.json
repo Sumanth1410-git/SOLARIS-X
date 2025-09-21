@@ -1,0 +1,22 @@
+{
+  "tensorflow": {
+    "model_name": "TensorFlow",
+    "target": "6h_ahead",
+    "auc_score": 0.9780597267034996
+  },
+  "lightgbm": {
+    "model_name": "LightGBM",
+    "target": "6h_ahead",
+    "auc_score": 0.9809463907354421
+  },
+  "xgboost": {
+    "model_name": "XGBoost",
+    "target": "6h_ahead",
+    "auc_score": 0.9798189096306592
+  },
+  "ensemble": {
+    "model_name": "Ensemble",
+    "target": "6h_ahead",
+    "auc_score": 0.9814603666355437
+  }
+}

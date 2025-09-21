@@ -1,0 +1,22 @@
+{
+  "tensorflow": {
+    "model_name": "TensorFlow",
+    "target": "binary",
+    "auc_score": 0.9999596568327968
+  },
+  "lightgbm": {
+    "model_name": "LightGBM",
+    "target": "binary",
+    "auc_score": 1.0
+  },
+  "xgboost": {
+    "model_name": "XGBoost",
+    "target": "binary",
+    "auc_score": 1.0
+  },
+  "ensemble": {
+    "model_name": "Ensemble",
+    "target": "binary",
+    "auc_score": 0.9999948650886425
+  }
+}

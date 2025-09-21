@@ -1,0 +1,42 @@
+# SOLARIS-X .gitignore - NUCLEAR VERSION
+# =====================================
+
+# Virtual Environment
+venv/
+.venv/
+env/
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*.pyc
+.Python
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# CRITICAL: RAW DATA EXCLUSION
+data/raw/
+data/raw/*
+data/raw/omni/*
+
+# PROCESSED DATA EXCLUSION  
+*.parquet
+*.h5
+*.pkl
+data/processed/features/*.parquet
+data/processed/cleaned/*.parquet
+
+# MODEL BINARIES
+models/checkpoints/*.h5
+models/checkpoints/*.pkl
+models/trained/
+
+# Logs & Temp
+*.log
+*.tmp
+.cache/
