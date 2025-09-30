@@ -1,42 +1,75 @@
-# SOLARIS-X .gitignore - NUCLEAR VERSION
-# =====================================
+# SOLARIS-X Production .gitignore - COMPREHENSIVE VERSION
+# ======================================================
 
-# Virtual Environment
+# Virtual Environment (CRITICAL - EXCLUDE EVERYTHING)
 venv/
 .venv/
 env/
 .env
+ENV/
+env.bak/
+venv.bak/
 
-# Python Cache
+# Python Cache & Bytecode
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
 *.pyc
 .Python
 
-# IDE & OS
+# IDE & Editors
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# OS Generated Files
 .DS_Store
 Thumbs.db
 
-# CRITICAL: RAW DATA EXCLUSION
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Logs & Debug
+*.log
+logs/
+
+# CRITICAL: LARGE RAW DATA FILES (COMPLETE EXCLUSION)
 data/raw/
 data/raw/*
+data/raw/omni/
 data/raw/omni/*
+data/raw/omni/*.txt
+data/raw/omni/*.csv
+*.txt.gz
+*.csv.gz
 
-# PROCESSED DATA EXCLUSION  
+# LARGE PROCESSED DATA FILES
 *.parquet
 *.h5
+*.hdf5
 *.pkl
 data/processed/features/*.parquet
 data/processed/cleaned/*.parquet
+data/processed/parquet/*.parquet
 
-# MODEL BINARIES
+# MODEL CHECKPOINTS (Keep structure, exclude large binaries)
 models/checkpoints/*.h5
 models/checkpoints/*.pkl
 models/trained/
+models/trained/*
+models/trained/*/model.pkl
+models/trained/*/scaler.pkl
+*.model
+*.joblib
 
-# Logs & Temp
-*.log
+# Temporary & Cache
 *.tmp
+*.temp
 .cache/
+
+# Environment Variables
+.env.local
+secrets.json
+api_keys.txt
