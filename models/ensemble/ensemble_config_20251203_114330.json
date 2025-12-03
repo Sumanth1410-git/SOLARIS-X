@@ -1,0 +1,58 @@
+{
+  "timestamp": "20251203_114330",
+  "weights": {
+    "precision": 0.40817711963770376,
+    "recall": 0.4015240709997199,
+    "balanced": 0.1902988093625764
+  },
+  "feature_names": [
+    "Year",
+    "Day",
+    "Hour",
+    "IMF_Magnitude",
+    "IMF_Bz",
+    "IMF_By",
+    "IMF_Bx",
+    "Proton_Temp",
+    "Proton_Density",
+    "Flow_Speed",
+    "Flow_Pressure",
+    "Dst_index",
+    "AE_index"
+  ],
+  "n_features": 13,
+  "training_history": [
+    {
+      "model": "precision",
+      "specialization": "conservative",
+      "min_child_samples": 30,
+      "auc": 0.9905304880977908,
+      "precision": 0.6753731343283582,
+      "recall": 0.4905149051490515,
+      "f1": 0.5682888540031397
+    },
+    {
+      "model": "recall",
+      "specialization": "aggressive",
+      "min_child_samples": 10,
+      "auc": 0.9897690325800793,
+      "precision": 0.663003663003663,
+      "recall": 0.4905149051490515,
+      "f1": 0.5638629283489096
+    },
+    {
+      "model": "balanced",
+      "specialization": "balanced",
+      "min_child_samples": 20,
+      "auc": 0.9899273225330609,
+      "precision": 0.6926070038910506,
+      "recall": 0.4823848238482385,
+      "f1": 0.5686900958466453
+    }
+  ],
+  "model_files": {
+    "precision": "model_precision_20251203_114330.txt",
+    "recall": "model_recall_20251203_114330.txt",
+    "balanced": "model_balanced_20251203_114330.txt"
+  }
+}

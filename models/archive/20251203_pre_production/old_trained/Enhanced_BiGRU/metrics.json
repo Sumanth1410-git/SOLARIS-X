@@ -1,0 +1,20 @@
+{
+  "validation": {
+    "accuracy": 0.9903406492912665,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "roc_auc": 0.647051938299258,
+    "average_precision": 0.01378502898883496,
+    "brier_score": 0.11976494713028249
+  },
+  "test": {
+    "accuracy": 0.9631993348982786,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "roc_auc": 0.5801693828404569,
+    "average_precision": 0.042806586371005366,
+    "brier_score": 0.12867951907357117
+  }
+}

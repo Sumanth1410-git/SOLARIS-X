@@ -1,3 +1,4 @@
+from scripts.training.utils.data_loader import safe_sequence_split
 """
 SOLARIS-X Bidirectional GRU Trainer
 Advanced Neural Network for Space Weather Time Series Prediction
@@ -26,26 +27,22 @@ class NeuralNetworkTrainer(BaseModelTrainer):
         self.sequence_length = config.MODELS['neural_network']['sequence_length']
         self.history = None
         
-    def create_sequences(self, X: pd.DataFrame, y: pd.Series, datetime_col: pd.Series):
+    def create_sequences(self, X: pd.DataFrame, y: pd.Series, datetime_col: pd.Series, stride: int = 6):
         """Create time series sequences for GRU training"""
-        print(f"🔄 Creating {self.sequence_length}-hour sequences...")
+        print(f"🔄 Creating {self.sequence_length}-hour sequences with stride {stride}...")
         
-        # Sort by datetime
-        sort_idx = datetime_col.argsort()
-        X_sorted = X.iloc[sort_idx].reset_index(drop=True)
-        y_sorted = y.iloc[sort_idx].reset_index(drop=True)
-        datetime_sorted = datetime_col.iloc[sort_idx].reset_index(drop=True)
+        X = X.reset_index(drop=True)
+        y = y.reset_index(drop=True)
         
         sequences_X, sequences_y = [], []
         
         # Create sequences with sliding window
-        for i in range(self.sequence_length, len(X_sorted)):
-            # Check if sequence is continuous (no large time gaps)
-            time_diff = (datetime_sorted.iloc[i] - datetime_sorted.iloc[i-self.sequence_length]).total_seconds() / 3600
-            
-            if time_diff <= self.sequence_length * 1.5:  # Allow some missing hours
-                sequences_X.append(X_sorted.iloc[i-self.sequence_length:i].values)
-                sequences_y.append(y_sorted.iloc[i])
+        for i in range(self.sequence_length, len(X), stride):
+            seq = X.iloc[i-self.sequence_length:i].values
+            if np.isnan(seq).any():
+                continue
+            sequences_X.append(seq)
+            sequences_y.append(y.iloc[i])
         
         X_seq = np.array(sequences_X, dtype=np.float32)
         y_seq = np.array(sequences_y, dtype=np.int8)
@@ -57,57 +54,45 @@ class NeuralNetworkTrainer(BaseModelTrainer):
     
     def build_model(self, input_shape: tuple, class_weights: dict) -> tf.keras.Model:
         """Build Bidirectional GRU model optimized for CPU"""
-        print("🧠 Building Bidirectional GRU architecture...")
+        print("🧠 Building a more regularized Bidirectional GRU architecture...")
+        
+        l2_reg = tf.keras.regularizers.l2(0.001)
         
         model = Sequential([
-            # First Bidirectional GRU layer
+            # A single, more regularized BiGRU layer is often better
             Bidirectional(
                 GRU(
                     self.config.MODELS['neural_network']['lstm_units'],
-                    return_sequences=True,
-                    dropout=0.1,
-                    recurrent_dropout=0.1
+                    return_sequences=False, # Only need output from the last time step
+                    dropout=self.config.MODELS['neural_network']['dropout_rate'],
+                    recurrent_dropout=0.2, # Stronger recurrent dropout
+                    kernel_regularizer=l2_reg
                 ),
                 input_shape=input_shape,
-                name='bigru_layer_1'
+                name='bigru_layer'
             ),
             
             # Batch normalization for stability
             BatchNormalization(),
             
-            # Second Bidirectional GRU layer
-            Bidirectional(
-                GRU(
-                    self.config.MODELS['neural_network']['lstm_units'] // 2,
-                    return_sequences=False,
-                    dropout=0.1,
-                    recurrent_dropout=0.1
-                ),
-                name='bigru_layer_2'
-            ),
-            
-            # Batch normalization
-            BatchNormalization(),
-            
             # Dense layers with dropout
-            Dense(64, activation='relu', name='dense_1'),
-            Dropout(self.config.MODELS['neural_network']['dropout_rate']),
-            
-            Dense(32, activation='relu', name='dense_2'),
+            Dense(32, activation='relu', name='dense_1', kernel_regularizer=l2_reg),
             Dropout(self.config.MODELS['neural_network']['dropout_rate']),
             
             # Output layer
             Dense(1, activation='sigmoid', name='output')
         ])
         
-        # Calculate class weight ratio for loss function
-        pos_weight = class_weights[1] / class_weights[0] if class_weights else 1.0
+        # Use label smoothing to prevent overconfidence
+        loss = tf.keras.losses.BinaryCrossentropy(label_smoothing=0.01)
         
-        # Compile with focal loss for imbalanced data
         model.compile(
             optimizer=Adam(learning_rate=self.config.MODELS['neural_network']['learning_rate']),
-            loss='binary_crossentropy',  # Could upgrade to focal loss
-            metrics=['accuracy', 'precision', 'recall', tf.keras.metrics.AUC(name='auc')]
+            loss=loss,
+            metrics=['accuracy', 
+                     tf.keras.metrics.Precision(name='precision'), 
+                     tf.keras.metrics.Recall(name='recall'), 
+                     tf.keras.metrics.AUC(name='auc')]
         )
         
         print(f"🏗️ Model architecture created:")
@@ -116,29 +101,25 @@ class NeuralNetworkTrainer(BaseModelTrainer):
         return model
     
     def train_model(self, data: dict) -> 'NeuralNetworkTrainer':
-        """Train Bidirectional GRU model"""
-        print(f"\n🧠 Training {self.model_name} Model...")
+        """Train Bidirectional GRU model with strict non-overlapping sequence split"""
+        print(f"\n60 Training {self.model_name} Model...")
         print("=" * 60)
-        
-        # Prepare sequence data
-        print("📊 Preparing training sequences...")
-        X_train_seq, y_train_seq = self.create_sequences(
-            data['X_train_scaled'], 
-            data['y_train'], 
-            data['datetime_train']
-        )
-        
-        print("📊 Preparing validation sequences...")
-        X_val_seq, y_val_seq = self.create_sequences(
-            data['X_validation_scaled'], 
-            data['y_validation'], 
-            data['datetime_validation']
+
+        # Use safe_sequence_split for strict temporal separation
+        print("4ca Creating non-overlapping train/val sequences (safe split)...")
+        split_date = '2017-01-01'  # Should match your config temporal split
+        seq_len = self.sequence_length
+        X_full = pd.concat([data['X_train_scaled'], data['X_validation_scaled']])
+        y_full = pd.concat([data['y_train'], data['y_validation']])
+        dt_full = pd.concat([data['datetime_train'], data['datetime_validation']])
+        X_train_seq, y_train_seq, X_val_seq, y_val_seq = safe_sequence_split(
+            X_full, y_full, dt_full, split_date, seq_len
         )
         
         # Build model
         input_shape = (X_train_seq.shape[1], X_train_seq.shape[2])
         self.model = self.build_model(input_shape, data['class_weights'])
-        
+
         # Callbacks for training
         callbacks = [
             EarlyStopping(
@@ -163,19 +144,20 @@ class NeuralNetworkTrainer(BaseModelTrainer):
                 mode='max'
             )
         ]
-        
+
         # Train model
-        print("🚀 Starting BiGRU training...")
+        print("680 Starting BiGRU training...")
         self.history = self.model.fit(
             X_train_seq, y_train_seq,
             validation_data=(X_val_seq, y_val_seq),
             epochs=self.config.MODELS['neural_network']['epochs'],
             batch_size=self.config.MODELS['neural_network']['batch_size'],
             callbacks=callbacks,
+            class_weight=data.get('class_weights'),
             verbose=1
         )
-        
-        print("✅ BiGRU training completed!")
+
+        print("3c5 BiGRU training completed!")
         return self
     
     def plot_training_history(self):

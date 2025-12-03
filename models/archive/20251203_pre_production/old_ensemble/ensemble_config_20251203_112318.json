@@ -1,0 +1,55 @@
+{
+  "timestamp": "20251203_112318",
+  "weights": {
+    "precision": 0.35587568576012313,
+    "recall": 0.5365255824308517,
+    "balanced": 0.10759873180902517
+  },
+  "feature_names": [
+    "Year",
+    "Day",
+    "Hour",
+    "IMF_Magnitude",
+    "IMF_Bz",
+    "IMF_By",
+    "IMF_Bx",
+    "Proton_Temp",
+    "Proton_Density",
+    "Flow_Speed",
+    "Flow_Pressure",
+    "Dst_index",
+    "AE_index"
+  ],
+  "n_features": 13,
+  "training_history": [
+    {
+      "model": "precision",
+      "scale_pos_weight": 30,
+      "auc": 0.9752247127601699,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    {
+      "model": "recall",
+      "scale_pos_weight": 60,
+      "auc": 0.9777937512766105,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    {
+      "model": "balanced",
+      "scale_pos_weight": 36,
+      "auc": 0.9758705654501421,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    }
+  ],
+  "model_files": {
+    "precision": "model_precision_20251203_112318.txt",
+    "recall": "model_recall_20251203_112318.txt",
+    "balanced": "model_balanced_20251203_112318.txt"
+  }
+}

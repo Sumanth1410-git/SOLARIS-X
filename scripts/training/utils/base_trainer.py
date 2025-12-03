@@ -182,7 +182,7 @@ class BaseModelTrainer:
             with open(history_path, 'w') as f:
                 json.dump(self.training_history, f, indent=2)
         
-        print(f"💾 Model saved to: {model_dir}")
+        print(f"Model saved to: {model_dir}")
         
         return model_dir
     
@@ -199,6 +199,6 @@ class BaseModelTrainer:
             with open(metrics_path, 'r') as f:
                 self.metrics = json.load(f)
         
-        print(f"📁 Model loaded from: {model_dir}")
+        print(f"Model loaded from: {model_dir}")
         
         return self

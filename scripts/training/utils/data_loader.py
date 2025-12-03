@@ -1,3 +1,36 @@
+def safe_sequence_split(X, y, datetime_col, split_date, sequence_length):
+    """
+    Create non-overlapping train/val sequences for time series.
+    X, y, datetime_col: full dataset (chronologically sorted)
+    split_date: the datetime at which to split (e.g., '2017-01-01')
+    sequence_length: number of timesteps in each sequence
+    Returns: X_train_seq, y_train_seq, X_val_seq, y_val_seq
+    """
+    import pandas as pd
+    # Reset all indices to ensure alignment
+    X = X.reset_index(drop=True)
+    y = y.reset_index(drop=True)
+    datetime_col = pd.Series(datetime_col).reset_index(drop=True)
+    # Ensure datetime_col is sorted
+    datetime_col = pd.Series(datetime_col).sort_values().reset_index(drop=True)
+    X = X.loc[datetime_col.index].reset_index(drop=True)
+    y = y.loc[datetime_col.index].reset_index(drop=True)
+
+    split_idx = datetime_col.searchsorted(pd.to_datetime(split_date))
+
+    # Training: sequences ending strictly before split_idx
+    train_indices = [i for i in range(sequence_length, split_idx)]
+    # Validation: sequences starting at split_idx (first val seq uses only val data)
+    val_indices = [i for i in range(split_idx + sequence_length, len(X))]
+
+    def build_sequences(indices):
+        X_seq = np.array([X.iloc[i-sequence_length:i].values for i in indices])
+        y_seq = np.array([y.iloc[i] for i in indices])
+        return X_seq, y_seq
+
+    X_train_seq, y_train_seq = build_sequences(train_indices)
+    X_val_seq, y_val_seq = build_sequences(val_indices)
+    return X_train_seq, y_train_seq, X_val_seq, y_val_seq
 """
 SOLARIS-X Memory-Optimized Data Pipeline - CORRECTED VERSION
 NASA-Level Space Weather Data Processing for CPU Training
@@ -35,22 +68,27 @@ class SolarisDataPipeline:
             gc.collect()
     
     def load_feature_data(self) -> pd.DataFrame:
-        """Load engineered features with memory optimization"""
-        print("📁 Loading SOLARIS-X feature dataset...")
+        """Load CORRECTED engineered features with proper storm definition"""
+        print("📁 Loading CORRECTED SOLARIS-X feature dataset...")
         self.monitor_memory()
         
-        # Load data with memory optimization
-        data_path = self.config.DATA_PATH / self.config.FEATURE_FILE
+        # FIXED: Simple absolute path to corrected features
+        data_path = Path('data/processed/features/solaris_x_features_corrected.parquet')
         
         try:
-            # Load with chunked reading for large datasets
+            # Load corrected data
             df = pd.read_parquet(data_path)
-            print(f"✅ Loaded {len(df):,} records with {len(df.columns)} features")
+            print(f"✅ Loaded CORRECTED data: {len(df):,} records with {len(df.columns)} features")
             
-            # Convert datetime if needed
-            if self.config.DATETIME_COLUMN in df.columns:
-                if not pd.api.types.is_datetime64_any_dtype(df[self.config.DATETIME_COLUMN]):
-                    df[self.config.DATETIME_COLUMN] = pd.to_datetime(df[self.config.DATETIME_COLUMN])
+            # Verify corrected storm rates
+            if 'Storm' in df.columns:
+                storm_rate = df['Storm'].mean() * 100
+                print(f"🌪️  CORRECTED Storm rate (Kp≥5): {storm_rate:.1f}%")
+                
+                if storm_rate > 20:
+                    print("🚨 WARNING: Storm rate still too high! Check storm definition.")
+                else:
+                    print("✅ Storm rate looks realistic")
             
             # Memory optimization
             df = self.optimize_memory_usage(df)
@@ -59,7 +97,9 @@ class SolarisDataPipeline:
             return df
             
         except Exception as e:
-            print(f"❌ Error loading data: {e}")
+            print(f"❌ Error loading corrected data: {e}")
+            print(f"💡 Looking for file at: {data_path.absolute()}")
+            print("💡 Make sure you're in the SOLARIS-X root directory!")
             raise
     
     def optimize_memory_usage(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -69,7 +109,7 @@ class SolarisDataPipeline:
         start_memory = df.memory_usage(deep=True).sum() / 1024**2
         
         for col in df.columns:
-            if col in [self.config.DATETIME_COLUMN, 'Solar_Cycle']:
+            if pd.api.types.is_datetime64_any_dtype(df.index):
                 continue
                 
             col_type = df[col].dtype
@@ -99,79 +139,56 @@ class SolarisDataPipeline:
         return df
     
     def create_temporal_splits(self, df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
-        """Create temporal train/validation/test splits"""
+        """Create temporal train/validation/test splits using datetime index"""
         print("📅 Creating temporal data splits...")
         
-        # Sort by datetime
-        df = df.sort_values(self.config.DATETIME_COLUMN).reset_index(drop=True)
-        
-        # Create splits based on dates
-        train_mask = df[self.config.DATETIME_COLUMN] <= pd.to_datetime(self.config.TRAIN_END_DATE)
-        val_mask = ((df[self.config.DATETIME_COLUMN] > pd.to_datetime(self.config.TRAIN_END_DATE)) & 
-                   (df[self.config.DATETIME_COLUMN] <= pd.to_datetime(self.config.VAL_END_DATE)))
-        test_mask = df[self.config.DATETIME_COLUMN] >= pd.to_datetime(self.config.TEST_START_DATE)
+        # Use datetime index for splitting
+        train_mask = df.index.year <= 2016
+        val_mask = (df.index.year >= 2017) & (df.index.year <= 2020)
+        test_mask = df.index.year >= 2021
         
         splits = {
-            'train': df[train_mask].copy().reset_index(drop=True),
-            'validation': df[val_mask].copy().reset_index(drop=True), 
-            'test': df[test_mask].copy().reset_index(drop=True)
+            'train': df[train_mask].copy(),
+            'validation': df[val_mask].copy(), 
+            'test': df[test_mask].copy()
         }
         
-        print("📊 Data split summary:")
+        print("📊 CORRECTED Data split summary:")
         for split_name, split_df in splits.items():
-            date_range = f"{split_df[self.config.DATETIME_COLUMN].min().date()} to {split_df[self.config.DATETIME_COLUMN].max().date()}"
-            storm_rate = split_df[self.config.TARGET_COLUMN].mean() * 100
+            date_range = f"{split_df.index.min().date()} to {split_df.index.max().date()}"
+            storm_rate = split_df['Storm'].mean() * 100
             print(f"  {split_name:>10}: {len(split_df):>7,} samples | {date_range} | Storm rate: {storm_rate:.1f}%")
         
         return splits
     
-    def prepare_features_targets(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series]:
-        """Separate features and targets - NO LEAKAGE VERSION"""
-    
-        # Identify feature and target columns
-        exclude_cols = [self.config.DATETIME_COLUMN, 'Solar_Cycle'] + self.config.LEAKAGE_FEATURES
-        target_cols = [col for col in df.columns if 'Storm' in col]
+    def prepare_features_targets(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series, pd.Series]:
+        """Separate features and targets with corrected storm definition - FIXED DATETIME HANDLING"""
+        
+        # CORRECTED: Use proper storm column
+        target_col = 'Storm'
+        exclude_cols = ['Storm', 'Moderate_Storm', 'Kp_actual', 'Kp_index']
+        
+        # Get feature columns (exclude storm-related columns)
         feature_cols = [col for col in df.columns if col not in exclude_cols]
-    
-        # Remove any remaining leakage features
-        feature_cols = [col for col in feature_cols if not any(leak in col for leak in self.config.LEAKAGE_FEATURES)]
-    
-        # Store for later use
-        self.feature_columns = feature_cols
-        self.target_columns = target_cols
-    
-        print(f"🔍 Features: {len(feature_cols)} columns")
-        print(f"🎯 Targets: {len(target_cols)} columns")
-        print(f"🚫 Excluded leakage features: {len(self.config.LEAKAGE_FEATURES)}")
-    
-        # Handle missing values BEFORE splitting
+        
+        print(f"🔍 CORRECTED Features: {len(feature_cols)} columns")
+        print(f"🎯 Target: {target_col} (corrected storm definition)")
+        
+        # Prepare data
         X = df[feature_cols].copy()
-        y = df[target_cols].copy()
-        datetime_col = df[self.config.DATETIME_COLUMN].copy()
-    
-        # Remove rows with missing targets
-        valid_mask = ~y[self.config.TARGET_COLUMN].isna()
-        X = X[valid_mask].reset_index(drop=True)
-        y = y[valid_mask].reset_index(drop=True)
-        datetime_col = datetime_col[valid_mask].reset_index(drop=True)
-
-        # Fill remaining missing values in features
+        y = df[target_col].copy()
+        
+        # FIXED: Convert datetime index to Series for compatibility
+        datetime_series = pd.Series(df.index, index=df.index)
+        
+        # Handle missing values
         X = X.fillna(method='ffill').fillna(method='bfill').fillna(0)
-    
-        print(f"✅ Clean dataset: {len(X):,} samples ready for training")
-        print(f"📊 Feature categories preserved:")
-    
-        # Categorize remaining features
-        physics_features = [col for col in feature_cols if any(x in col for x in ['IMF_', 'Newell_', 'Epsilon_', 'Merging_', 'Alfven_', 'Beta_'])]
-        temporal_features = [col for col in feature_cols if any(x in col for x in ['_lag_', '_mean_', '_std_', 'Sin', 'Cos', 'Phase'])]
-        basic_features = [col for col in feature_cols if col not in physics_features + temporal_features]
-    
-        print(f"  🧲 Physics features: {len(physics_features)}")
-        print(f"  ⏰ Temporal features: {len(temporal_features)}")  
-        print(f"  📊 Basic features: {len(basic_features)}")
-    
-        return X, y, datetime_col
-
+        
+        # Verify target distribution
+        storm_rate = y.mean() * 100
+        print(f"✅ Clean dataset: {len(X):,} samples, storm rate: {storm_rate:.1f}%")
+        
+        return X, y, datetime_series
     
     def scale_features(self, X_train: pd.DataFrame, X_val: pd.DataFrame = None, 
                       X_test: pd.DataFrame = None) -> Tuple:
@@ -222,16 +239,16 @@ class SolarisDataPipeline:
         class_weights = dict(zip(np.unique(y), weights))
         
         storm_rate = y.mean() * 100
-        print(f"📊 Storm rate: {storm_rate:.1f}% | Class weights: {class_weights}")
+        print(f"📊 CORRECTED Storm rate: {storm_rate:.1f}% | Class weights: {class_weights}")
         
         return class_weights
     
     def prepare_training_data(self) -> Dict[str, Any]:
-        """Complete data preparation pipeline - FIXED VERSION"""
-        print("🚀 SOLARIS-X Data Pipeline - INITIATED")
+        """Complete CORRECTED data preparation pipeline"""
+        print("🚀 SOLARIS-X CORRECTED Data Pipeline - INITIATED")
         print("=" * 60)
         
-        # Load data
+        # Load corrected data
         df = self.load_feature_data()
         
         # Create temporal splits  
@@ -241,10 +258,10 @@ class SolarisDataPipeline:
         prepared_splits = {}
         
         for split_name, split_df in splits.items():
-            X, y, datetime_col = self.prepare_features_targets(split_df)
+            X, y, datetime_series = self.prepare_features_targets(split_df)
             prepared_splits[f'X_{split_name}'] = X
-            prepared_splits[f'y_{split_name}'] = y[self.config.TARGET_COLUMN]
-            prepared_splits[f'datetime_{split_name}'] = datetime_col
+            prepared_splits[f'y_{split_name}'] = y
+            prepared_splits[f'datetime_{split_name}'] = datetime_series
         
         # Scale features
         X_train_scaled, X_val_scaled, X_test_scaled = self.scale_features(
@@ -263,11 +280,11 @@ class SolarisDataPipeline:
         prepared_splits['class_weights'] = class_weights
         
         # Add metadata
-        prepared_splits['feature_columns'] = self.feature_columns
+        prepared_splits['feature_columns'] = list(X_train_scaled.columns)
         prepared_splits['scaler'] = self.scaler
         
         print("=" * 60)
-        print("✅ SOLARIS-X Data Pipeline - COMPLETE")
+        print("✅ SOLARIS-X CORRECTED Data Pipeline - COMPLETE")
         self.monitor_memory()
         
         return prepared_splits
