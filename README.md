@@ -4,7 +4,6 @@
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.20-orange)](https://tensorflow.org/)
 [![LightGBM](https://img.shields.io/badge/LightGBM-4.6-green)](https://lightgbm.readthedocs.io/)
 [![License](https://img.shields.io/badge/License-MIT-red)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Production--Ready-brightgreen)](https://github.com/yourusername/SOLARIS-X)
 
 > **World-class machine learning system for geomagnetic storm prediction using 29 years of space weather data**
 
@@ -228,6 +227,7 @@ This project is licensed under the **MIT License**.
 **[⭐ Star this repository](https://github.com/Sumanth1410-git/SOLARIS-X)** if it helps your research!
 
 </div>
+
 
 
 
