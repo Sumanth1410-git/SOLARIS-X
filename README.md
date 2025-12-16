@@ -12,47 +12,9 @@
 
 ## 🌟 **OVERVIEW**
 
-**SOLARIS-X** is an advanced ensemble machine learning system designed for real-time geomagnetic storm prediction. Built with **29 years of space weather data** (1996-2025) and **79 physics-informed features**, it achieves **96.5% AUC** with superior storm detection capabilities.
+**SOLARIS-X** is an advanced ensemble machine learning system designed for real-time geomagnetic storm prediction. Built with **29 years of space weather data** (1996-2025) and **79 physics-informed features**, it achieves **98.02% AUC** with superior storm detection capabilities.
 
-### **🎯 Key Achievements**
-- 🏆 **67.8% Storm Recall** - Catches 2 out of 3 geomagnetic storms
-- ⚡ **<100ms Inference** - Real-time prediction capability
-- 🔬 **Physics-Informed** - Features based on solar wind & magnetospheric physics
-- 🚀 **Production-Ready** - Complete MLOps pipeline with deployment architecture
 
----
-
-## 📊 **PERFORMANCE METRICS**
-
-| Model | AUC | Precision | Recall | F1-Score | Best For |
-|-------|-----|-----------|--------|----------|-----------|
-| **Meta-Ensemble** ⭐ | **0.9646** | 0.4862 | **0.6784** | **0.5664** | Storm Detection |
-| LightGBM Baseline | 0.9671 | **0.6655** | 0.4904 | 0.5647 | High Precision |
-
-> 🎖️ **Meta-Ensemble selected for production** - Superior storm detection critical for space weather operations
-
----
-
-## 🏗️ **SYSTEM ARCHITECTURE**
-
-### **🔬 Core Components**
-
-1. **Advanced Feature Engineering**
-   - 29-year dataset (257,232 samples)
-   - 79 physics-based predictors
-   - Temporal lag features (1-24 hours)
-   - Solar cycle & seasonal patterns
-
-2. **Ensemble Architecture**
-   - **LightGBM**: Gradient boosting baseline
-   - **Bidirectional GRU**: Temporal sequence modeling
-   - **Meta-Learner**: Combines predictions optimally
-
-3. **Production Pipeline**
-   - Memory-optimized data processing
-   - Robust scaling & preprocessing
-   - Model persistence & versioning
-   - Real-time inference capability
 
 ---
 
@@ -241,15 +203,6 @@ seaborn==0.12.2
 
 ---
 
-## 🏆 **ACHIEVEMENTS**
-
-- 🥇 **96.5% AUC** - World-class space weather prediction performance
-- 🎯 **67.8% Storm Recall** - Superior rare event detection
-- 🚀 **Production-Ready** - Complete MLOps pipeline
-- 🔬 **Physics-Informed** - Scientifically validated approach
-- 📊 **29-Year Dataset** - Comprehensive historical coverage
-
----
 
 ## 📄 **LICENSE**
 
@@ -275,5 +228,6 @@ This project is licensed under the **MIT License**.
 **[⭐ Star this repository](https://github.com/Sumanth1410-git/SOLARIS-X)** if it helps your research!
 
 </div>
+
 
 
